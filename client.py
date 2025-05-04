@@ -62,9 +62,9 @@ async def main():
     single_request_time = total_time / total_requests  # Время работы одного запроса
     throughput_time = total_requests / total_time  # Общая пропускная способность
 
-    print(f"Время за которое было выполнено {total_requests} запросов: {total_time} секунд")
-    print(f"Время работы одного запроса: {single_request_time} секунд")
-    print(f"Общая пропускная способность серверов: {throughput_time} запросов/секунду")
+    print(f"Время за которое было выполнено {total_requests:.2f} запросов: {total_time} секунд")
+    print(f"Время работы одного запроса: {single_request_time:.2f} секунд")
+    print(f"Общая пропускная способность серверов: {throughput_time:.2f} запросов/секунду")
 
 
 asyncio.run(main())
