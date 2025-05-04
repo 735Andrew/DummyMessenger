@@ -1,0 +1,8 @@
+# Packages
+__pycache__ 
+
+
+venv
+.env 
+.idea
+messages.db 
