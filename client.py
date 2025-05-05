@@ -7,17 +7,15 @@ import time
 fake = Faker("ru_RU")  # Инициализация объекта для получения вспомогательных данных
 
 
-async def send_message(client):
+async def send_message(client, name: str):
     URLs = [
         "http://localhost:1234/message",
         "http://localhost:4321/message",
     ]
     URL = choice(URLs)
 
-    names = list([fake.first_name() for _ in range(10)])
-    name = choice(names)
-
     text = fake.text()  # Генерация случайного текста
+
     payload = {
         "name": name,
         "text": text,
@@ -35,10 +33,12 @@ async def send_message(client):
         return None
 
 
-async def worker(client, num_requests):
+async def worker(client, num_requests, names):
     """Функция обработчик запросов"""
+
     for _ in range(num_requests):
-        await send_message(client)
+        name = choice(names)
+        await send_message(client, name)
 
 
 async def main():
@@ -46,12 +46,14 @@ async def main():
     REQUESTS_PER_COROUTINE = 100
     total_requests = COROUTINES_QUANTITY * REQUESTS_PER_COROUTINE
 
+    names = list([fake.first_name() for _ in range(10)])  # Создание перечня имён
+
     start_time = time.perf_counter()  # Запуск таймера
 
     async with httpx.AsyncClient() as client:
 
         tasks = [
-            asyncio.create_task(worker(client, REQUESTS_PER_COROUTINE))
+            asyncio.create_task(worker(client, REQUESTS_PER_COROUTINE, names))
             for _ in range(COROUTINES_QUANTITY)
         ]
         await asyncio.gather(*tasks)
@@ -64,7 +66,9 @@ async def main():
 
     print(f"Время за которое было выполнено {total_requests} запросов: {total_time:.2f} секунд")
     print(f"Время работы одного запроса: {single_request_time:.2f} секунд")
-    print(f"Общая пропускная способность серверов: {throughput_time:.2f} запросов/секунду")
+    print(
+        f"Общая пропускная способность серверов: {throughput_time:.2f} запросов/секунду"
+    )
 
 
 asyncio.run(main())
